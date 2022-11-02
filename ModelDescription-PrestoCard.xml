@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Models>
+	<Model name="PrestoCardChargingMachine" type="coupled" description="a coupled system for a self-service presto card recharge.">
+		<Inputs>
+			<Port name="money_in" type="float" description="a customer insert money into the machine"/>	
+			<Port name="card_in" type="int" description="a customer insert presto card into the machine"/>
+			<Port name="request_in" type="int" description="a customer requests receipt"/>			
+		</Inputs>
+		<Outputs>
+			<Port name="balance_out" type="float" description="machine display the current balance"/>
+			<Port name="request_out" type="int" description="machine prints out the receipt"/>
+		</Outputs>
+		<Files>	
+			<File name="PrestoCardChargingMachine.ma" type="MA" location="/"/>
+			<File name="PrestoCardChargingMachine.ev" type="EV" location="/"/>
+			<File name="PrestoCardChargingMachine.log" type="LOG" location="/"/>
+			<File name="PrestoCardChargingMachine.bat" type="BAT" location="/"/>
+		</Files>
+	</Model>
+	<Model name="ChargeController" type="coupled" description="a coupled central components to deal with all the messages from the peripheral equipment.">
+		<Inputs>
+			<Port name="inMC" type="float" description="receives message from money collector"/>	
+			<Port name="inCR" type="int" description="receives message from card reader"/>	
+			<Port name="inRP" type="int" description="receives message from receipt processor"/>				
+		</Inputs>
+		<Outputs>
+			<Port name="outCBD" type="float" description="output balance to balance display"/>	
+			<Port name="outCRP" type="int" description="output card information to receipt processor"/>	
+		</Outputs>
+		<Files>
+			<File name="ChargeController.ma" type="MA" location="/"/>
+		</Files>
+	</Model>
+	<Model name="CentralController" type="atomic" description="the central part of the machine, process the message from the message queue">
+		<Inputs>
+			<Port name="message_in" type="int" description="messages from message queue"/>	
+		</Inputs>
+		<Outputs>
+			<Port name="control_balance_out" type="int" description="send the message to balance display"/>
+			<Port name="control_receipt_out" type="int" description="send message to receipt processor"/>
+			<Port name="queue_out" type="int" description="send confirm message to message queue"/>
+		</Outputs>
+		<Files>
+			<File name="CentralController.h" type="H" location="/"/>
+			<File name="CentralController.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+	<Model name="MessageQueue" type="atomic" description="process the receipt print request from user">
+		<Inputs>
+			<Port name="money_in" type="int" description="the message from money collector"/>	
+			<Port name="card_in" type="int" description="the card information message from card reader"/>
+			<Port name="receipt_request_in" type="int" description="receipt request message from receipt processor"/>
+			<Port name="done" type="int" description="message from central controller"/>
+		</Inputs>
+		<Outputs>
+			<Port name="message_out" type="int" description="send the message to central controller"/>
+		</Outputs>
+		<Files>
+			<File name="MessageQueue.h" type="H" location="/"/>
+			<File name="MessageQueue.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+	</Model>
+		<Model name="ReceiptProcessor" type="atomic" description="process the receipt print request from user">
+		<Inputs>
+			<Port name="request_in" type="int" description="a user requests the receipt"/>	
+			<Port name="central_control_in" type="int" description="central controller sends the card information to receipt processor"/>
+		</Inputs>
+		<Outputs>
+			<Port name="request_out" type="int" description="send the receipt print request to the recharge controller"/>
+			<Port name="receipt_out" type="int" description="print out the receipt"/>
+		</Outputs>
+		<Files>
+			<File name="ReceiptProcessor.h" type="H" location="/"/>
+			<File name="ReceiptProcessor.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+	<Model name="BalanceDisplay" type="atomic" description="display the balance of presto card">
+		<Inputs>
+			<Port name="balance_in" type="float" description="the balance of the presto card"/>	
+		</Inputs>
+		<Outputs>
+			<Port name="balance_out" type="float" description="display the balance of presto card"/>
+		</Outputs>
+		<Files>
+			<File name="BalanceDisplay.h" type="H" location="/"/>
+			<File name="BalanceDisplay.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+	<Model name="CardReader" type="atomic" description="user inserts presto card into this part">
+		<Inputs>
+			<Port name="cardInfo_in" type="int" description="a presto card has been inserted into it"/>			
+		</Inputs>
+		<Outputs>
+			<Port name="cardInfo_out" type="int" description="send the card number to central controller"/>
+		</Outputs>
+		<Files>
+			<File name="CardReader.h" type="H" location="/"/>
+			<File name="CardReader.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+	<Model name="MoneyCollector" type="atomic" description="user inserts money into part">
+		<Inputs>
+			<Port name="money_in" type="float" description="a customer inserts money into it"/>			
+		</Inputs>
+		<Outputs>
+			<Port name="money_out" type="float" description="send the amount of money to central controller"/>
+		</Outputs>
+		<Files>
+			<File name="MoneyCollector.h" type="H" location="/"/>
+			<File name="MoneyCollector.cpp" type="CPP" location="/"/>
+		</Files>
+	</Model>
+</Models>
